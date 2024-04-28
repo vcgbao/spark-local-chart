@@ -1,0 +1,18 @@
+metadata:
+  name: ""
+  namespace: default
+spec:
+  image: ""
+  imagePullPolicy: Always
+  mainClass: ""
+  mainApplicationFile: ""
+  arguments: []
+  restartPolicy:
+    type: Never
+  driver:
+    cores: 1
+    coreLimit: 1
+    memory: 1G
+    secrets: []
+    configMaps: []
+    env: []

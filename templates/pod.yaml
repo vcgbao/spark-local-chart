@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ .Values.metadata.name }}
+  namespace: {{ .Values.metadata.namespace }}
+  labels:
+    app.kubernetes.io/name: {{ .Values.metadata.name }}
+spec:
+  {{- if .Values.spec.driver.initContainers }}
+  initContainers:
+{{ toYaml .Values.spec.driver.initContainers | indent 4 }}
+  {{- end }}
+  containers:
+  {{- if .Values.spec.driver.sidecars }}
+{{ toYaml .Values.spec.driver.sidecars | indent 2 }}
+  {{- end }}
+  - name: spark-driver
+    image: {{ .Values.spec.image }}
+    args:
+      - driver
+      - --properties-file
+      - /opt/spark/conf/spark.properties
+      - --class
+      - {{ .Values.spec.mainClass }}
+      - {{ .Values.spec.mainApplicationFile }}
+      {{- range $arg := .Values.spec.arguments }}
+      - {{ $arg | toString | quote }}
+      {{- end }}
+    ports:
+      - name: driver-rpc-port
+        containerPort: 7078
+        protocol: TCP
+      - name: blockmanager
+        containerPort: 7079
+        protocol: TCP
+      - name: spark-ui
+        containerPort: 4040
+        protocol: TCP
+    resources:
+      limits:
+        cpu: {{ .Values.spec.driver.coreLimit | default .Values.spec.driver.cores }}
+        memory: {{ include "addMemoryOverhead" (dict "memory" .Values.spec.driver.memory "overhead" (include "getMemoryOverhead" . )) }}Mi
+      requests:
+        memory:  {{ include "addMemoryOverhead" (dict "memory" .Values.spec.driver.memory "overhead" (include "getMemoryOverhead" . )) }}Mi
+        cpu: {{ .Values.spec.driver.cores }}
+    {{- if .Values.spec.driver.env }}
+    env:
+{{ toYaml .Values.spec.driver.env | indent 6 }}
+    {{- end }}
+    volumeMounts:
+      - name: spark-local-dir
+        mountPath: /var/data/spark-{{ .Values.metadata.name }}-local-dir
+      - name: spark-conf-volume-driver
+        mountPath: /opt/spark/conf
+      {{- if .Values.spec.driver.secrets }}
+      {{- range $secret := .Values.spec.driver.secrets }}
+      - name: {{ $secret.name }}
+        mountPath: {{ $secret.path }}
+      {{- end }}
+      {{- end }}
+      {{- if .Values.spec.driver.configMaps }}
+      {{- range $configMap := .Values.spec.driver.configMaps }}
+      - name: {{ $configMap.name }}
+        mountPath: {{ $configMap.path }}
+      {{- end }}
+      {{- end }}
+  volumes:
+    - name: spark-local-dir
+      emptyDir: {}
+    - name: spark-conf-volume-driver
+      configMap:
+        name: spark-drv-{{ .Values.metadata.name }}-conf-map
+        items:
+          - key: spark.properties
+            path: spark.properties
+            mode: 420
+    {{- if .Values.spec.driver.secrets }}
+    {{- range $secret := .Values.spec.driver.secrets }}
+    - name: {{ $secret.name }}
+      secret:
+        secretName: {{ $secret.name }}
+        defaultMode: 420
+    {{- end }}
+    {{- end }}
+    {{- if .Values.spec.driver.configMaps }}
+    {{- range $configMap := .Values.spec.driver.configMaps }}
+    - name: {{ $configMap.name }}
+      configMap:
+        name: {{ $configMap.name }}
+        defaultMode: 420
+    {{- end }}
+    {{- end }}
+  restartPolicy: {{ .Values.spec.restartPolicy.type }}
+  {{ if .Values.spec.imagePullSecrets }}imagePullSecrets: {{ .Values.spec.imagePullSecrets }}{{ end }}

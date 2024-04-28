@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.metadata.name }}-svc
+spec:
+  selector:
+    app.kubernetes.io/name: {{ .Values.metadata.name }}
+  ports:
+    - name: spark-ui
+      port: 4040
+      protocol: TCP
+      targetPort: spark-ui
+    - name: driver-rpc-port
+      port: 7078
+      protocol: TCP
+      targetPort: driver-rpc-port
+    - name: blockmanager
+      port: 7079
+      protocol: TCP
+      targetPort: blockmanager
