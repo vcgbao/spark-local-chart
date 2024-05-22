@@ -2,6 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: spark-drv-{{ .Values.metadata.name }}-conf-map
+  namespace: {{ .Values.metadata.namespace }}
 data:
   spark.properties: |
     spark.app.name: {{ .Values.metadata.name }}

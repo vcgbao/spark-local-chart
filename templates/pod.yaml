@@ -56,12 +56,18 @@ spec:
       {{- range $secret := .Values.spec.driver.secrets }}
       - name: {{ $secret.name }}
         mountPath: {{ $secret.path }}
+        {{- if $secret.subPath }}
+        subPath: {{ $secret.subPath }}
+        {{- end }}
       {{- end }}
       {{- end }}
       {{- if .Values.spec.driver.configMaps }}
       {{- range $configMap := .Values.spec.driver.configMaps }}
       - name: {{ $configMap.name }}
         mountPath: {{ $configMap.path }}
+        {{- if $configMap.subPath }}
+        subPath: {{ $configMap.subPath }}
+        {{- end }}
       {{- end }}
       {{- end }}
   volumes:
@@ -91,4 +97,9 @@ spec:
     {{- end }}
     {{- end }}
   restartPolicy: {{ .Values.spec.restartPolicy.type }}
-  {{ if .Values.spec.imagePullSecrets }}imagePullSecrets: {{ .Values.spec.imagePullSecrets }}{{ end }}
+  {{- if .Values.spec.imagePullSecrets }}
+  imagePullSecrets:
+  {{- range $imagePullSecret := .Values.imagePullSecrets }}
+    - name: {{ $imagePullSecret }}
+  {{- end }}
+  {{- end }}

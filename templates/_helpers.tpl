@@ -32,8 +32,8 @@
 {{- if .Values.spec.sparkConf -}}
     {{- if index .Values.spec.sparkConf "spark.driver.memoryOverheadFactor" -}}
     {{- index .Values.spec.sparkConf "spark.driver.memoryOverheadFactor" -}}
-    {{- else if index .Values.spec.sparkConf "spark.memoryOverheadFactor" -}}
-    {{- index .Values.spec.sparkConf "spark.memoryOverheadFactor" -}}
+    {{- else if index .Values.spec.sparkConf "spark.kubernetes.memoryOverheadFactor" -}}
+    {{- index .Values.spec.sparkConf "spark.kubernetes.memoryOverheadFactor" -}}
     {{- else -}}
     {{- 0.1 -}}
     {{- end -}}
