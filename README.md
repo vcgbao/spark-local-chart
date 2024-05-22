@@ -47,3 +47,7 @@ spec:
           name: my-secret
           key: MY_SECRET
 ````
+## Installation
+````bash
+$ helm repo add spark-local-chart https://vcgbao.github.io/spark-local-chart/
+````
