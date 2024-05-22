@@ -1,0 +1,17 @@
+apiVersion: v1
+entries:
+  spark-local-chart:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-05-22T14:19:12.173191268Z"
+    description: A Helm chart for those who want to run Spark in local mode on Kubernetes
+    digest: dc6d621308984da9e3075bf693d25491ed13f646660145c1835177775b22a399
+    maintainers:
+    - email: vcgbao@gmail.com
+      name: vcgbao
+    name: spark-local-chart
+    type: application
+    urls:
+    - https://github.com/vcgbao/spark-local-chart/releases/download/spark-local-chart-0.1.0/spark-local-chart-0.1.0.tgz
+    version: 0.1.0
+generated: "2024-05-22T14:19:12.173200706Z"
