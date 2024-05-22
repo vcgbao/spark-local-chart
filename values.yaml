@@ -1,18 +1,41 @@
 metadata:
-  name: ""
-  namespace: default
+  name: spark-pi
+  namespace: spark-local
 spec:
-  image: ""
+  imagePullSecrets:
+    - my-secret
+  sparkConf:
+    spark.ui.proxyRedirectUri: "/"
+  image: apache/spark:3.5.1
   imagePullPolicy: Always
-  mainClass: ""
-  mainApplicationFile: ""
-  arguments: []
+  mainClass: org.apache.spark.examples.SparkPi
+  mainApplicationFile: /opt/spark/examples/jars/spark-examples_2.12-3.5.1.jar
+  arguments:
+    - 1000
   restartPolicy:
     type: Never
   driver:
     cores: 1
     coreLimit: 1
     memory: 1G
-    secrets: []
-    configMaps: []
-    env: []
+    secrets:
+      - name: hadoop-conf
+        path: /opt/hadoop/conf
+        subPath: my-conf
+    configMaps:
+      - name: my-conf
+        path: /opt/my-conf
+        subPath: my-conf
+    env:
+      - name: MY_ENV
+        value: my_env
+      - name: CONFIG_MAP_ENV
+        valueFrom:
+          configMapKeyRef:
+            name: my-config-map
+            key: my_key
+      - name: SECRET_ENV
+        valueFrom:
+          secretKeyRef:
+            name: my-secret
+            key: MY_SECRET
